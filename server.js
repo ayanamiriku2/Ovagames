@@ -227,7 +227,22 @@ app.use(async (req, res) => {
  */
 function processResponse(req, res, sourceResponse, config) {
   const statusCode = sourceResponse.status;
-  const contentType = sourceResponse.headers.get("content-type") || "";
+  let contentType = sourceResponse.headers.get("content-type") || "";
+
+  // Fix MIME type based on URL extension when upstream returns wrong type
+  const reqPath = req.path.toLowerCase();
+  if (reqPath.endsWith(".css") || reqPath.includes("css.php")) {
+    if (!contentType.includes("text/css")) {
+      contentType = "text/css; charset=utf-8";
+      sourceResponse.headers.set("content-type", contentType);
+    }
+  } else if (reqPath.endsWith(".js") || reqPath.includes("js.php")) {
+    if (!contentType.includes("javascript")) {
+      contentType = "application/javascript; charset=utf-8";
+      sourceResponse.headers.set("content-type", contentType);
+    }
+  }
+
   const contentCategory = getContentCategory(contentType);
 
   // ─── Set Response Headers ──────────────────────────────
