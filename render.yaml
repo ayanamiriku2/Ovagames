@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: ovagames-mirror
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /_health
+    envVars:
+      - key: SOURCE_DOMAIN
+        value: www.ovagames.com
+      - key: MIRROR_DOMAIN
+        sync: false
+      - key: MIRROR_PROTOCOL
+        value: https
+      - key: SOURCE_PROTOCOL
+        value: https
+      - key: NODE_ENV
+        value: production
