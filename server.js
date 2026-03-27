@@ -104,10 +104,10 @@ app.get("/_health", (req, res) => {
 app.get("/_refresh-cf", async (_req, res) => {
   try {
     if (isBrowserReady()) {
-      const ok = await refreshChallenge(`${SOURCE_ORIGIN}/`);
+      const ok = await refreshChallenge();
       res.json({ status: ok ? "ok" : "failed", browserReady: isBrowserReady() });
     } else {
-      await startBrowser(`${SOURCE_ORIGIN}/`, { timeout: 90000 });
+      await startBrowser();
       res.json({ status: "ok", browserReady: isBrowserReady() });
     }
   } catch (error) {
@@ -325,7 +325,7 @@ async function startServer() {
   // Start browser and solve CF challenge on startup
   console.log("\n[Setup] Starting Chrome browser and solving CF challenge...");
   try {
-    await startBrowser(`${SOURCE_ORIGIN}/`, { timeout: 90000 });
+    await startBrowser();
     console.log(`[Setup] Browser: ${isBrowserReady() ? "✅ ready" : "❌ failed"}`);
     console.log(`[Setup] Fallback mirror: ${FALLBACK_MIRROR_PROTOCOL}://${FALLBACK_MIRROR_DOMAIN} (auto-detected from request headers)`);
   } catch (error) {
@@ -338,7 +338,7 @@ async function startServer() {
     if (isBrowserReady()) {
       console.log("[CF-Refresh] Refreshing Cloudflare session...");
       try {
-        await refreshChallenge(`${SOURCE_ORIGIN}/`);
+        await refreshChallenge();
       } catch (error) {
         console.error("[CF-Refresh] Failed:", error.message);
       }

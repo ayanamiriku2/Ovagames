@@ -17,7 +17,7 @@ ENV CHROME_PATH=/usr/bin/google-chrome-stable
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json package-lock.json* ./
 RUN npm install --production
 
 COPY . .
