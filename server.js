@@ -223,6 +223,45 @@ app.use(async (req, res) => {
 });
 
 /**
+ * Replace donate page content with custom crypto donation info
+ */
+function replaceDonatePage(html) {
+  const customContent = `
+<hr>
+<p><span style="color: #ffff00;"><strong>SUPPORT US WITH CRYPTO</strong></span></p>
+<blockquote><p>If you enjoy using this site, you can support us by donating cryptocurrency to any of the addresses below. Every donation helps keep this site alive!</p></blockquote>
+
+<p><span style="color: #ffff00;"><strong>BITCOIN (BTC)</strong></span></p>
+<blockquote><p style="word-break: break-all; font-family: monospace; font-size: 13px;">bc1ql6mxrpw6hgcjlt9ny4f9m9qj5c9n8q6fqp0r8qdvyxeyd6arvq7qt0yzdh</p></blockquote>
+
+<p><span style="color: #ffff00;"><strong>LITECOIN (LTC)</strong></span></p>
+<blockquote><p style="word-break: break-all; font-family: monospace; font-size: 13px;">ltc1q9ql9dvznmlka3k0mjatlt7kppj8qu4gu8z9ef9qcrhdewhja7xnsw5059g</p></blockquote>
+
+<p><span style="color: #ffff00;"><strong>BNB SMART CHAIN (BEP-20)</strong></span></p>
+<blockquote><p style="word-break: break-all; font-family: monospace; font-size: 13px;">0x5dea511ce409452a38e283462e0c8afd2e8d720b</p></blockquote>
+
+<p><span style="color: #ffff00;"><strong>SOLANA (SOL)</strong></span></p>
+<blockquote><p style="word-break: break-all; font-family: monospace; font-size: 13px;">6y31Eqx74xVumCiunL25Ff1ms3iA9eFUffrVHu5SYE2R</p></blockquote>
+
+<p style="text-align: center;">&#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039; &#10084;&#65039;</p>`;
+
+  // Replace the inner content between the <hr> tags and closing </div> of post-wrapper
+  const startMarker = /<hr\s*\/?>\s*<hr\s*\/?>\s*<hr\s*\/?>/i;
+  const endMarker = /<p[^>]*>\s*(?:❤️\s*)+<\/p>/i;
+
+  const startMatch = html.match(startMarker);
+  const endMatch = html.match(endMarker);
+
+  if (startMatch && endMatch) {
+    const startIdx = startMatch.index;
+    const endIdx = endMatch.index + endMatch[0].length;
+    html = html.substring(0, startIdx) + customContent + html.substring(endIdx);
+  }
+
+  return html;
+}
+
+/**
  * Process and rewrite the upstream response
  */
 function processResponse(req, res, sourceResponse, config) {
@@ -291,6 +330,10 @@ function processResponse(req, res, sourceResponse, config) {
         ...config,
         requestPath: req.path,
       });
+      // Replace donate page content with custom crypto donation info
+      if (req.path === "/donate" || req.path === "/donate/") {
+        responseText = replaceDonatePage(responseText);
+      }
       break;
     }
     case "css": {
